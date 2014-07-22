@@ -44,9 +44,7 @@ all:
 	$(FLASCC)/usr/bin/g++ gme_wrap.c gme/*.cpp libgme.as testfs*.abc \
 		main.cpp demo/Wave_Writer.cpp -emit-swc=sample.libgme -o libgme.swc
 	rm -f libgme.as
-	$(FLEX)/bin/mxmlc -static-link-runtime-shared-libraries \
-		-compiler.omit-trace-statements=false -library-path=libgme.swc \
-		-debug=false demo.as -o demo.swf
+	$(FLEX)/bin/mxmlc -compiler.omit-trace-statements=false -library-path=libgme.swc -debug=false demo.as -o demo.swf
 
 include Makefile.common 
 
