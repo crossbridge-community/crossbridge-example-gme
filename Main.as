@@ -32,12 +32,12 @@ package
   import flash.display.Sprite;
   import flash.text.TextField;
   import flash.events.Event;
-  import sample.libgme.CModule;
-  import sample.libgme.vfs.RootFSBackingStore;
+  import crossbridge.GME.CModule;
+  import crossbridge.GME.vfs.RootFSBackingStore;
 
-  public class demo extends Sprite
+  public class Main extends Sprite
   {
-    public function demo()
+    public function Main()
     {
       CModule.vfs.addBackingStore(new RootFSBackingStore(), null);
       addEventListener(Event.ADDED_TO_STAGE, initCode);

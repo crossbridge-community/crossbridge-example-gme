@@ -26,9 +26,45 @@
 # =END MIT LICENSE
 #
 
+# Detect host 
+$?UNAME=$(shell uname -s)
+#$(info $(UNAME))
+ifneq (,$(findstring CYGWIN,$(UNAME)))
+	$?nativepath=$(shell cygpath -at mixed $(1))
+	$?unixpath=$(shell cygpath -at unix $(1))
+else
+	$?nativepath=$(abspath $(1))
+	$?unixpath=$(abspath $(1))
+endif
+
+# CrossBridge SDK Home
+ifneq "$(wildcard $(call unixpath,$(FLASCC_ROOT)/sdk))" ""
+ $?FLASCC:=$(call unixpath,$(FLASCC_ROOT)/sdk)
+else
+ $?FLASCC:=/path/to/crossbridge-sdk/
+endif
+$?ASC2=java -jar $(call nativepath,$(FLASCC)/usr/lib/asc2.jar) -merge -md -parallel
+ 
+# Auto Detect AIR/Flex SDKs
+ifneq "$(wildcard $(AIR_HOME)/lib/compiler.jar)" ""
+ $?FLEX=$(AIR_HOME)
+else
+ $?FLEX:=/path/to/adobe-air-sdk/
+endif
+
+# C/CPP Compiler
+$?BASE_CFLAGS=-Werror -Wno-write-strings -Wno-trigraphs
+$?EXTRACFLAGS=
+$?OPT_CFLAGS=-O4
+
+# ASC2 Compiler
+$?MXMLC_DEBUG=true
+$?SWF_VERSION=26
+$?SWF_SIZE=800x600
+
 .PHONY: clean all 
 
-all:
+all: clean
 	$(FLASCC)/usr/bin/swig -as3 gme.i
 	$(FLASCC)/usr/bin/genfs --type=embed testfiles testfs
 	$(ASC2) \
@@ -42,12 +78,9 @@ all:
 		-import $(call nativepath,$(FLASCC)/usr/lib/PlayerKernel.abc) \
 		testfs*.as
 	$(FLASCC)/usr/bin/g++ gme_wrap.c gme/*.cpp libgme.as testfs*.abc \
-		main.cpp demo/Wave_Writer.cpp -emit-swc=sample.libgme -o libgme.swc
+		main.cpp demo/Wave_Writer.cpp -emit-swc=crossbridge.GME -o release/crossbridge-gme.swc
 	rm -f libgme.as
-	$(FLEX)/bin/mxmlc -compiler.omit-trace-statements=false -library-path=libgme.swc -debug=false demo.as -o demo.swf
-
-include Makefile.common 
+	$(FLEX)/bin/mxmlc -compiler.omit-trace-statements=false -library-path=release/crossbridge-gme.swc -debug=false Main.as -o bin/Main.swf
 
 clean:
-	rm -f libgme.swc gme_wrap.c gme_wrap.o libgme.as demo.swf testfs* \
-
+	rm -f gme_wrap.c gme_wrap.o libgme.as *.swf testfs* 
