@@ -65,6 +65,7 @@ $?SWF_SIZE=800x600
 .PHONY: clean all 
 
 all: clean
+	mkdir -p release
 	$(FLASCC)/usr/bin/swig -as3 gme.i
 	$(FLASCC)/usr/bin/genfs --type=embed testfiles testfs
 	$(ASC2) \
@@ -83,4 +84,5 @@ all: clean
 	$(FLEX)/bin/mxmlc -compiler.omit-trace-statements=false -library-path=release/crossbridge-gme.swc -debug=false Main.as -o bin/Main.swf
 
 clean:
+	rm -rf release
 	rm -f gme_wrap.c gme_wrap.o libgme.as *.swf testfs* 

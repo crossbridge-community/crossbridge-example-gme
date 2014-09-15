@@ -28,7 +28,6 @@
 #
 
 *.swf
-*.swc
 *.abc
 gme_wrap.c
 testfs.rules
